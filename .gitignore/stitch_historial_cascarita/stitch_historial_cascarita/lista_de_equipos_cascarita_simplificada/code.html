@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,700;1,700&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed-dim": "#46eaed",
+                        "primary-dim": "#ff69a3",
+                        "tertiary-fixed": "#ff9734",
+                        "secondary-container": "#00696b",
+                        "on-secondary": "#005b5d",
+                        "background": "#0e0e0e",
+                        "on-error": "#490013",
+                        "on-secondary-container": "#d9ffff",
+                        "primary": "#ff88b2",
+                        "inverse-primary": "#ba0064",
+                        "surface-container": "#1a1a1a",
+                        "primary-fixed": "#ff6fa5",
+                        "secondary-dim": "#46eaed",
+                        "outline-variant": "#484847",
+                        "error-dim": "#d73357",
+                        "surface-variant": "#262626",
+                        "on-tertiary-fixed": "#291200",
+                        "tertiary-container": "#fd8b00",
+                        "outline": "#767575",
+                        "on-error-container": "#ffb2b9",
+                        "secondary": "#5af8fb",
+                        "tertiary-dim": "#ed8200",
+                        "on-tertiary-fixed-variant": "#5a2e00",
+                        "surface-container-high": "#20201f",
+                        "surface-container-lowest": "#000000",
+                        "surface-bright": "#2c2c2c",
+                        "on-tertiary": "#532a00",
+                        "on-primary-container": "#4c0025",
+                        "surface-container-low": "#131313",
+                        "on-primary": "#610031",
+                        "tertiary": "#ff9f4a",
+                        "primary-container": "#ff6fa5",
+                        "surface-tint": "#ff88b2",
+                        "error-container": "#a70138",
+                        "on-secondary-fixed-variant": "#006668",
+                        "on-primary-fixed-variant": "#5d002f",
+                        "on-surface-variant": "#adaaaa",
+                        "on-secondary-fixed": "#004748",
+                        "on-surface": "#ffffff",
+                        "on-tertiary-container": "#442100",
+                        "inverse-on-surface": "#565555",
+                        "primary-fixed-dim": "#ff5099",
+                        "surface-dim": "#0e0e0e",
+                        "surface": "#0e0e0e",
+                        "on-primary-fixed": "#000000",
+                        "error": "#ff6e84",
+                        "on-background": "#ffffff",
+                        "secondary-fixed": "#5af8fb",
+                        "tertiary-fixed-dim": "#f58600",
+                        "surface-container-highest": "#262626",
+                        "inverse-surface": "#fcf9f8"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #0e0e0e;
+        }
+        .serif-title { font-family: 'Noto Serif', serif; }
+        .glass-card {
+            background: rgba(38, 38, 38, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary/30 min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-[#0e0e0e] text-[#ff88b2] docked full-width top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#ff88b2] hover:opacity-80 transition-opacity cursor-pointer scale-95 active:transition-transform" data-icon="menu">menu</span>
+<h1 class="Headline-LG Noto Serif bold tracking-tight text-2xl font-serif text-[#ff88b2] italic uppercase">CASCARITA</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#5af8fb]" data-icon="search">search</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto px-6 pt-8">
+<!-- Hero Section / Header Action -->
+<section class="">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-6">
+<div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<h2 class="serif-title text-4xl font-bold text-on-surface mb-2 tracking-tight">Equipos</h2>
+<p class="text-on-surface-variant font-body text-sm">Gestiona las retas de hoy.</p>
+</div>
+</div>
+</section>
+<!-- Team List Hierarchy -->
+<div class="flex flex-col gap-4">
+<!-- Active / Playing Card -->
+<div class="p-1 bg-gradient-to-r from-primary to-secondary rounded-2xl">
+<div class="bg-surface-container-lowest rounded-[14px] p-5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="sports_soccer">sports_soccer</span>
+</div>
+<div>
+<h3 class="serif-title text-xl font-bold text-on-surface">Equipo 1</h3>
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-secondary"></span>
+<span class="text-secondary text-xs font-bold uppercase tracking-widest">En Cancha</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Card: Statistics Break -->
+<div class="grid grid-cols-2 gap-4 my-2">
+<div class="bg-surface-container-low p-4 rounded-2xl flex flex-col justify-between h-32 border-l-4 border-tertiary">
+<span class="material-symbols-outlined text-tertiary" data-icon="timer">timer</span>
+<div>
+<div class="text-2xl font-bold text-on-surface serif-title">08:45</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest">Próxima Reta</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-2xl flex flex-col justify-between h-32 border-l-4 border-secondary">
+<span class="material-symbols-outlined text-secondary" data-icon="groups">groups</span>
+<div>
+<div class="text-2xl font-bold text-on-surface serif-title">04</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest">En Espera</div>
+</div>
+</div>
+</div>
+<!-- List of Teams in Queue -->
+<h4 class="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.2em] mt-4 mb-2 px-1">Fila de Espera</h4>
+<!-- Equipo 2 Card -->
+<div class="bg-surface-container-low rounded-2xl p-5 flex items-center justify-between group hover:bg-surface-container transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="shield">shield</span>
+</div>
+<div>
+<h3 class="serif-title text-lg font-bold text-on-surface">Equipo 2</h3>
+<p class="text-on-surface-variant text-xs">Capitán: Beto G.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Equipo 3 Card -->
+<div class="bg-surface-container-low rounded-2xl p-5 flex items-center justify-between group hover:bg-surface-container transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="diversity_3">diversity_3</span>
+</div>
+<div>
+<h3 class="serif-title text-lg font-bold text-on-surface">Equipo 3</h3>
+<p class="text-on-surface-variant text-xs">Capitán: Sofía M.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Equipo 4 Card (Incomplete) -->
+<div class="bg-surface-container-low rounded-2xl p-5 flex items-center justify-between opacity-80 border border-dashed border-outline-variant/30">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" data-icon="person_add">person_add</span>
+</div>
+<div>
+<h3 class="serif-title text-lg font-bold text-outline">Incompleto</h3>
+</div>
+</div>
+<button class="px-4 py-2 bg-secondary/10 text-secondary rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-secondary hover:text-on-secondary transition-all">
+                    Unirse
+                </button>
+</div>
+</div>
+<!-- Design Note Section -->
+<div class="mt-12 p-6 rounded-2xl bg-surface-container-low/50 text-center relative">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter">Próximo Torneo</div>
+<p class="text-on-surface-variant italic font-serif text-sm">"Donde la calle se vuelve estadio."</p>
+</div>
+</main>
+<!-- FAB (Contextual) -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary-container rounded-full shadow-2xl flex items-center justify-center z-40 transition-transform active:scale-90 border-4 border-background">
+<span class="material-symbols-outlined" data-icon="add" data-weight="fill" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#0e0e0e] rounded-t-2xl shadow-[0_-4px_20px_rgba(255,136,178,0.08)]">
+<!-- Marcador -->
+<a class="flex flex-col items-center justify-center text-[#5af8fb]/60 px-4 py-2 hover:text-[#ff88b2] transition-colors scale-90 active:duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="scoreboard">scoreboard</span>
+<span class="Body-MD Manrope font-medium tracking-wide uppercase text-[10px]">Marcador</span>
+</a>
+<!-- Equipos (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#ff88b2]/10 text-[#ff88b2] rounded-xl px-4 py-2 hover:text-[#ff88b2] transition-colors scale-90 active:duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="groups" data-weight="fill" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="Body-MD Manrope font-medium tracking-wide uppercase text-[10px]">Equipos</span>
+</a>
+<!-- Historial -->
+<a class="flex flex-col items-center justify-center text-[#5af8fb]/60 px-4 py-2 hover:text-[#ff88b2] transition-colors scale-90 active:duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="Body-MD Manrope font-medium tracking-wide uppercase text-[10px]">Historial</span>
+</a>
+<!-- Ajustes -->
+<a class="flex flex-col items-center justify-center text-[#5af8fb]/60 px-4 py-2 hover:text-[#ff88b2] transition-colors scale-90 active:duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="Body-MD Manrope font-medium tracking-wide uppercase text-[10px]">Ajustes</span>
+</a>
+</nav>
+</body></html>
