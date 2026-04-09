@@ -64,8 +64,19 @@ if __name__ == "__main__":
                     elif opcion == "5":
                         break
             
-            # Verificar si alguien ganó después de la acción
-            if Teams[0].puntaje >= punt_max:
+            # Logica de juego
+            if cont_p3 >= 2:
+                if Teams[0].puntaje == desempate:
+                    print(f"El equipo {Teams[0].nombre} ha ganado")
+                    moverVisita()
+                    restablecerPuntaje()
+                elif Teams[1].puntaje == desempate:
+                    print(f"El equipo {Teams[1].nombre} ha ganado")
+                    moverLocal()
+                    restablecerPuntaje()
+            elif Teams[0].puntaje == punt_max - 1 and Teams[1].puntaje == punt_max - 1:
+                empate()
+            elif Teams[0].puntaje >= punt_max:
                 print(f"El equipo {Teams[0].nombre} ha ganado")
                 moverVisita()
                 restablecerPuntaje()
