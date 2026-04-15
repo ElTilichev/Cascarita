@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FF0E0E0E</color>
+    <color name="on_surface">#FFFFFFFF</color>
+    <color name="primary">#FFFF88B2</color>
+    <color name="secondary">#FF5AF8FB</color>
+    <color name="surface">#FF0E0E0E</color>
+    <color name="tertiary">#FFFF9F4A</color>
+    <string name="app_name">Cascarita</string>
+    <style name="Theme.Cascarita" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>
