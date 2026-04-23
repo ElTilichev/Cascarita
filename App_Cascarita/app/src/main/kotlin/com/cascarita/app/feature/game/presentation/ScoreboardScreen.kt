@@ -1,6 +1,7 @@
 package com.cascarita.app.feature.game.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.RestartAlt
@@ -67,7 +69,7 @@ fun ScoreboardScreen(
         item {
             QueueSection(
                 teams = uiState.queuedTeams,
-                onRemoveTeam = { /* TODO: Implement */ }
+                onRemoveTeam = { teamId -> viewModel.removeTeam(teamId) }
             )
         }
 
@@ -75,6 +77,7 @@ fun ScoreboardScreen(
         item {
             MatchSettingsSection(
                 targetScore = uiState.targetScore,
+                onUpdateTargetScore = { viewModel.updateTargetScore(it) },
                 onResetScores = { viewModel.resetScores() }
             )
         }
@@ -92,73 +95,75 @@ fun ScoreboardSection(
     isOvertime: Boolean,
     onScorePoint: (Long) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Team 1
-        TeamScoreCard(
-            team = team1,
-            teamLabel = "LOCAL",
-            isHighlighted = false,
-            onScorePoint = onScorePoint,
-            modifier = Modifier.weight(1f)
-        )
-
-        // VS Separator
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(2.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, OutlineVariant, Color.Transparent)
-                        )
-                    )
+            // Team 1
+            TeamScoreCard(
+                team = team1,
+                teamLabel = "LOCAL",
+                isHighlighted = false,
+                onScorePoint = onScorePoint,
+                modifier = Modifier.weight(1f)
             )
-            Text(
-                text = "VS",
-                style = MaterialTheme.typography.headlineSmall,
-                color = Secondary,
-                fontWeight = FontWeight.Bold
-            )
-            Box(
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(2.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(OutlineVariant, OutlineVariant, Color.Transparent)
+
+            // VS Separator
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(2.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, OutlineVariant, Color.Transparent)
+                            )
                         )
-                    )
+                )
+                Text(
+                    text = "VS",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Secondary,
+                    fontWeight = FontWeight.Bold
+                )
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(2.dp)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(OutlineVariant, OutlineVariant, Color.Transparent)
+                            )
+                        )
+                )
+            }
+
+            // Team 2
+            TeamScoreCard(
+                team = team2,
+                teamLabel = "VISITA",
+                isHighlighted = true,
+                onScorePoint = onScorePoint,
+                modifier = Modifier.weight(1f)
             )
         }
 
-        // Team 2
-        TeamScoreCard(
-            team = team2,
-            teamLabel = "VISITA",
-            isHighlighted = true,
-            onScorePoint = onScorePoint,
-            modifier = Modifier.weight(1f)
-        )
-    }
-
-    if (isOvertime) {
-        Text(
-            text = "¡PRÓRROGA!",
-            style = MaterialTheme.typography.labelLarge,
-            color = Tertiary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-        )
+        if (isOvertime) {
+            Text(
+                text = "¡PRÓRROGA!",
+                style = MaterialTheme.typography.labelLarge,
+                color = Tertiary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
+        }
     }
 }
 
@@ -170,11 +175,21 @@ fun TeamScoreCard(
     onScorePoint: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
+    val cardModifier = if (team != null) {
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(SurfaceContainerHighest)
+            .clickable { onScorePoint(team.id) }
+            .padding(24.dp)
+    } else {
+        modifier
             .clip(RoundedCornerShape(12.dp))
             .background(SurfaceContainerHighest)
             .padding(24.dp)
+    }
+
+    Box(
+        modifier = cardModifier
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,20 +211,11 @@ fun TeamScoreCard(
                 fontWeight = FontWeight.Bold
             )
 
-            if (team != null) {
-                IconButton(
-                    onClick = { onScorePoint(team.id) },
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .offset(y = (-40).dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.AddCircle,
-                        contentDescription = "Agregar punto",
-                        tint = Primary
-                    )
-                }
-            }
+            Text(
+                text = teamLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = Outline
+            )
         }
     }
 }
@@ -375,6 +381,7 @@ fun QueueTeamItem(
 @Composable
 fun MatchSettingsSection(
     targetScore: Int,
+    onUpdateTargetScore: (Int) -> Unit,
     onResetScores: () -> Unit
 ) {
     Column(
@@ -398,13 +405,14 @@ fun MatchSettingsSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* TODO: Decrease score */ },
+                onClick = { onUpdateTargetScore(targetScore - 1) },
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
+                    .background(SurfaceContainerLow)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = Icons.Default.Remove,
                     contentDescription = "Menos",
                     tint = OnSurfaceVariant
                 )
@@ -425,10 +433,11 @@ fun MatchSettingsSection(
             }
 
             IconButton(
-                onClick = { /* TODO: Increase score */ },
+                onClick = { onUpdateTargetScore(targetScore + 1) },
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
+                    .background(SurfaceContainerLow)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

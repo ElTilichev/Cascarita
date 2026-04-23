@@ -9,9 +9,11 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import com.cascarita.app.core.database.CascaritaDatabase;
 import com.cascarita.app.core.database.GameDao;
+import com.cascarita.app.core.database.SettingsDao;
 import com.cascarita.app.core.database.TeamDao;
 import com.cascarita.app.core.di.DatabaseModule_ProvideDatabaseFactory;
 import com.cascarita.app.core.di.DatabaseModule_ProvideGameDaoFactory;
+import com.cascarita.app.core.di.DatabaseModule_ProvideSettingsDaoFactory;
 import com.cascarita.app.core.di.DatabaseModule_ProvideTeamDaoFactory;
 import com.cascarita.app.feature.game.data.GameRepositoryImpl;
 import com.cascarita.app.feature.game.domain.CheckWinConditionUseCase;
@@ -22,6 +24,7 @@ import com.cascarita.app.feature.game.domain.ObserveGameStateUseCase;
 import com.cascarita.app.feature.game.domain.ResetScoresUseCase;
 import com.cascarita.app.feature.game.domain.RotateTeamsUseCase;
 import com.cascarita.app.feature.game.domain.ScorePointUseCase;
+import com.cascarita.app.feature.game.domain.UpdateTargetScoreUseCase;
 import com.cascarita.app.feature.game.presentation.GameViewModel;
 import com.cascarita.app.feature.game.presentation.GameViewModel_HiltModules;
 import com.cascarita.app.feature.team.data.TeamRepositoryImpl;
@@ -470,12 +473,16 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
       return new ObserveGameStateUseCase(singletonCImpl.gameRepositoryImplProvider.get());
     }
 
-    private AddTeamUseCase addTeamUseCase() {
-      return new AddTeamUseCase(singletonCImpl.teamRepositoryImplProvider.get());
+    private UpdateTargetScoreUseCase updateTargetScoreUseCase() {
+      return new UpdateTargetScoreUseCase(singletonCImpl.gameRepositoryImplProvider.get());
     }
 
     private RemoveTeamUseCase removeTeamUseCase() {
       return new RemoveTeamUseCase(singletonCImpl.teamRepositoryImplProvider.get());
+    }
+
+    private AddTeamUseCase addTeamUseCase() {
+      return new AddTeamUseCase(singletonCImpl.teamRepositoryImplProvider.get());
     }
 
     private ObserveTeamListUseCase observeTeamListUseCase() {
@@ -501,15 +508,15 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
-
       static String com_cascarita_app_feature_team_presentation_TeamViewModel = "com.cascarita.app.feature.team.presentation.TeamViewModel";
 
-      @KeepFieldType
-      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
+      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
 
       @KeepFieldType
       TeamViewModel com_cascarita_app_feature_team_presentation_TeamViewModel2;
+
+      @KeepFieldType
+      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -534,7 +541,7 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
       public T get() {
         switch (id) {
           case 0: // com.cascarita.app.feature.game.presentation.GameViewModel 
-          return (T) new GameViewModel(viewModelCImpl.scorePointUseCase(), viewModelCImpl.rotateTeamsUseCase(), viewModelCImpl.resetScoresUseCase(), viewModelCImpl.getOnCourtTeamsUseCase(), viewModelCImpl.getQueuedTeamsUseCase(), viewModelCImpl.checkWinConditionUseCase(), viewModelCImpl.handleOvertimeUseCase(), viewModelCImpl.observeGameStateUseCase());
+          return (T) new GameViewModel(viewModelCImpl.scorePointUseCase(), viewModelCImpl.rotateTeamsUseCase(), viewModelCImpl.resetScoresUseCase(), viewModelCImpl.getOnCourtTeamsUseCase(), viewModelCImpl.getQueuedTeamsUseCase(), viewModelCImpl.checkWinConditionUseCase(), viewModelCImpl.handleOvertimeUseCase(), viewModelCImpl.observeGameStateUseCase(), viewModelCImpl.updateTargetScoreUseCase(), viewModelCImpl.removeTeamUseCase());
 
           case 1: // com.cascarita.app.feature.team.presentation.TeamViewModel 
           return (T) new TeamViewModel(viewModelCImpl.addTeamUseCase(), viewModelCImpl.removeTeamUseCase(), viewModelCImpl.observeTeamListUseCase());
@@ -639,6 +646,10 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
       return DatabaseModule_ProvideGameDaoFactory.provideGameDao(provideDatabaseProvider.get());
     }
 
+    private SettingsDao settingsDao() {
+      return DatabaseModule_ProvideSettingsDaoFactory.provideSettingsDao(provideDatabaseProvider.get());
+    }
+
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
       this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<CascaritaDatabase>(singletonCImpl, 1));
@@ -680,7 +691,7 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
       public T get() {
         switch (id) {
           case 0: // com.cascarita.app.feature.game.data.GameRepositoryImpl 
-          return (T) new GameRepositoryImpl(singletonCImpl.teamDao(), singletonCImpl.gameDao());
+          return (T) new GameRepositoryImpl(singletonCImpl.teamDao(), singletonCImpl.gameDao(), singletonCImpl.settingsDao());
 
           case 1: // com.cascarita.app.core.database.CascaritaDatabase 
           return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));

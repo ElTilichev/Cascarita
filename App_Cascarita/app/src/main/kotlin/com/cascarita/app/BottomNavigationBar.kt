@@ -34,7 +34,6 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(Screen.Scoreboard, "Marcador", Icons.Default.Scoreboard),
     BottomNavItem(Screen.Teams, "Equipos", Icons.Default.Groups),
-    BottomNavItem(Screen.History, "Historial", Icons.Default.History),
     BottomNavItem(Screen.Settings, "Ajustes", Icons.Default.Settings)
 )
 

@@ -30,22 +30,26 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
 
   private volatile GameDao _gameDao;
 
+  private volatile SettingsDao _settingsDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `team` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `score` INTEGER NOT NULL, `position` INTEGER NOT NULL, `captain` TEXT, `isActive` INTEGER NOT NULL, `isOnCourt` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `game` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `team1Id` INTEGER NOT NULL, `team1Name` TEXT NOT NULL, `team1Score` INTEGER NOT NULL, `team2Id` INTEGER NOT NULL, `team2Name` TEXT NOT NULL, `team2Score` INTEGER NOT NULL, `winnerId` INTEGER NOT NULL, `winnerName` TEXT NOT NULL, `targetScore` INTEGER NOT NULL, `wasOvertime` INTEGER NOT NULL, `completedAt` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `settings` (`id` INTEGER NOT NULL, `targetScore` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '08dc2fe9a57bf0de756658bff7217e1e')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e6eb540a0764db15d4cede5df69ebb53')");
       }
 
       @Override
       public void dropAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS `team`");
         db.execSQL("DROP TABLE IF EXISTS `game`");
+        db.execSQL("DROP TABLE IF EXISTS `settings`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -129,9 +133,21 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
                   + " Expected:\n" + _infoGame + "\n"
                   + " Found:\n" + _existingGame);
         }
+        final HashMap<String, TableInfo.Column> _columnsSettings = new HashMap<String, TableInfo.Column>(2);
+        _columnsSettings.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSettings.put("targetScore", new TableInfo.Column("targetScore", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysSettings = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesSettings = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoSettings = new TableInfo("settings", _columnsSettings, _foreignKeysSettings, _indicesSettings);
+        final TableInfo _existingSettings = TableInfo.read(db, "settings");
+        if (!_infoSettings.equals(_existingSettings)) {
+          return new RoomOpenHelper.ValidationResult(false, "settings(com.cascarita.app.core.database.SettingsEntity).\n"
+                  + " Expected:\n" + _infoSettings + "\n"
+                  + " Found:\n" + _existingSettings);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "08dc2fe9a57bf0de756658bff7217e1e", "3cca45d6f67b774b12952b5e4bd9d020");
+    }, "e6eb540a0764db15d4cede5df69ebb53", "2710d26149ea35dbdf0f277f6e8c5f8b");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -142,7 +158,7 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "team","game");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "team","game","settings");
   }
 
   @Override
@@ -153,6 +169,7 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `team`");
       _db.execSQL("DELETE FROM `game`");
+      _db.execSQL("DELETE FROM `settings`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -169,6 +186,7 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(TeamDao.class, TeamDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(GameDao.class, GameDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(SettingsDao.class, SettingsDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -211,6 +229,20 @@ public final class CascaritaDatabase_Impl extends CascaritaDatabase {
           _gameDao = new GameDao_Impl(this);
         }
         return _gameDao;
+      }
+    }
+  }
+
+  @Override
+  public SettingsDao settingsDao() {
+    if (_settingsDao != null) {
+      return _settingsDao;
+    } else {
+      synchronized(this) {
+        if(_settingsDao == null) {
+          _settingsDao = new SettingsDao_Impl(this);
+        }
+        return _settingsDao;
       }
     }
   }

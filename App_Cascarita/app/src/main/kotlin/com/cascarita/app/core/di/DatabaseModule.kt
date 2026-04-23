@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.cascarita.app.core.database.CascaritaDatabase
 import com.cascarita.app.core.database.GameDao
 import com.cascarita.app.core.database.TeamDao
+import com.cascarita.app.core.database.SettingsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +26,8 @@ object DatabaseModule {
             context,
             CascaritaDatabase::class.java,
             "cascarita_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
@@ -36,5 +38,10 @@ object DatabaseModule {
     @Provides
     fun provideGameDao(database: CascaritaDatabase): GameDao {
         return database.gameDao()
+    }
+
+    @Provides
+    fun provideSettingsDao(database: CascaritaDatabase): SettingsDao {
+        return database.settingsDao()
     }
 }

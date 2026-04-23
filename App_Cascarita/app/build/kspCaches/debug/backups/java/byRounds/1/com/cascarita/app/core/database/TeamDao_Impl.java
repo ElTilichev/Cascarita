@@ -386,7 +386,7 @@ public final class TeamDao_Impl implements TeamDao {
 
   @Override
   public Object getOnCourtTeams(final Continuation<? super List<TeamEntity>> $completion) {
-    final String _sql = "SELECT * FROM team WHERE isOnCourt = 1 ORDER BY position ASC LIMIT 2";
+    final String _sql = "SELECT * FROM team ORDER BY position ASC LIMIT 2";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
     final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
     return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<List<TeamEntity>>() {
@@ -444,7 +444,7 @@ public final class TeamDao_Impl implements TeamDao {
 
   @Override
   public Flow<List<TeamEntity>> getQueuedTeams() {
-    final String _sql = "SELECT * FROM team WHERE isOnCourt = 0 ORDER BY position ASC";
+    final String _sql = "SELECT * FROM team WHERE position >= 2 ORDER BY position ASC";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
     return CoroutinesRoom.createFlow(__db, false, new String[] {"team"}, new Callable<List<TeamEntity>>() {
       @Override

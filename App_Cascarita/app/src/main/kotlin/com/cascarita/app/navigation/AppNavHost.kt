@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.cascarita.app.feature.game.presentation.ScoreboardScreen
 import com.cascarita.app.feature.team.presentation.TeamsScreen
+import com.cascarita.app.feature.splash.presentation.SplashScreen
+import com.cascarita.app.feature.settings.presentation.SettingsScreen
 
 @Composable
 fun AppNavHost(
@@ -15,9 +17,19 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Scoreboard.route,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(
+                onNavigateNext = {
+                    navController.navigate(Screen.Scoreboard.route) {
+                        popUpTo(Screen.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(Screen.Scoreboard.route) {
             ScoreboardScreen(
                 onNavigateToTeams = {
@@ -30,12 +42,8 @@ fun AppNavHost(
             TeamsScreen()
         }
         
-        composable(Screen.History.route) {
-            // TODO: Implement History Screen
-        }
-        
         composable(Screen.Settings.route) {
-            // TODO: Implement Settings Screen
+            SettingsScreen()
         }
     }
 }

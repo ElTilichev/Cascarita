@@ -16,10 +16,10 @@ interface TeamDao {
     @Query("SELECT * FROM team ORDER BY position ASC")
     suspend fun getAllTeamsOnce(): List<TeamEntity>
 
-    @Query("SELECT * FROM team WHERE isOnCourt = 1 ORDER BY position ASC LIMIT 2")
+    @Query("SELECT * FROM team ORDER BY position ASC LIMIT 2")
     suspend fun getOnCourtTeams(): List<TeamEntity>
 
-    @Query("SELECT * FROM team WHERE isOnCourt = 0 ORDER BY position ASC")
+    @Query("SELECT * FROM team WHERE position >= 2 ORDER BY position ASC")
     fun getQueuedTeams(): Flow<List<TeamEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

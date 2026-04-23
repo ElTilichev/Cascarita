@@ -6,10 +6,13 @@ import com.cascarita.app.core.database.GameDao
 import com.cascarita.app.core.database.GameEntity
 import com.cascarita.app.core.database.TeamDao
 import com.cascarita.app.core.database.TeamEntity
+import com.cascarita.app.core.database.SettingsDao
+import com.cascarita.app.core.database.SettingsEntity
 import com.cascarita.app.feature.game.domain.GameRepository
 import com.cascarita.app.feature.game.domain.GameState
 import com.cascarita.app.feature.game.domain.Team
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -18,14 +21,18 @@ import javax.inject.Singleton
 @Singleton
 class GameRepositoryImpl @Inject constructor(
     private val teamDao: TeamDao,
-    private val gameDao: GameDao
+    private val gameDao: GameDao,
+    private val settingsDao: SettingsDao
 ) : GameRepository {
 
     override fun observeGameState(): Flow<GameState> {
-        return teamDao.getAllTeams().map { teamEntities ->
+        return combine(
+            teamDao.getAllTeams(),
+            settingsDao.observeSettings()
+        ) { teamEntities, settingsEntity ->
+            val targetScore = settingsEntity?.targetScore ?: GameConstants.DEFAULT_TARGET_SCORE
             val teams = teamEntities.map { it.toDomain() }
             val onCourtTeams = teams.filter { it.position < 2 }
-            val targetScore = GameConstants.DEFAULT_TARGET_SCORE
             
             // Check for overtime condition
             val isOvertime = onCourtTeams.size == 2 && 
@@ -56,6 +63,9 @@ class GameRepositoryImpl @Inject constructor(
                 return Result.Error(Exception("Not enough teams"))
             }
 
+            val settings = settingsDao.getSettings()
+            val targetScore = settings?.targetScore ?: GameConstants.DEFAULT_TARGET_SCORE
+
             // Save game result
             val team1 = allTeams[0]
             val team2 = allTeams[1]
@@ -70,28 +80,32 @@ class GameRepositoryImpl @Inject constructor(
                 team2Score = team2.score,
                 winnerId = winner.id,
                 winnerName = winner.name,
-                targetScore = GameConstants.DEFAULT_TARGET_SCORE,
-                wasOvertime = team1.score == GameConstants.DEFAULT_TARGET_SCORE - 1 && 
-                             team2.score == GameConstants.DEFAULT_TARGET_SCORE - 1
+                targetScore = targetScore,
+                wasOvertime = team1.score == targetScore - 1 && 
+                             team2.score == targetScore - 1
             )
             gameDao.insertGame(game)
 
-            // Move winner to end, loser stays in position 0
-            val winnerIndex = allTeams.indexOfFirst { it.id == winnerId }
-            if (winnerIndex != -1) {
-                val winnerTeam = allTeams.removeAt(winnerIndex)
-                allTeams.add(winnerTeam)
+            // Move winner to end, loser stays in position 0 (or moves to end too? usually loser goes to end)
+            // Error report says: "Aunado al error anterior, la aplicacion ya no puede subir el puntaje de ninguno de los dos equipos, tampoco podemos agregar equipos, quitarlos ni moverlos"
+            // Let's implement a standard rotation: Loser goes to end of queue. Winner stays on court? 
+            // Usually in "cascaritas", winner stays, loser goes to end. 
+            // Or maybe both go to end?
+            
+            val loserId = if (winnerId == team1.id) team2.id else team1.id
+            val loserIndex = allTeams.indexOfFirst { it.id == loserId }
+            if (loserIndex != -1) {
+                val loserTeam = allTeams.removeAt(loserIndex)
+                allTeams.add(loserTeam)
             }
 
-            // Reset scores for new first two teams
-            if (allTeams.size >= 2) {
-                allTeams[0] = allTeams[0].copy(score = 0)
-                allTeams[1] = allTeams[1].copy(score = 0)
-            }
-
-            // Update positions and save
+            // Reset scores for all teams to be safe, or just the ones moving
             allTeams.forEachIndexed { index, team ->
-                teamDao.updateTeam(team.copy(position = index))
+                val updatedTeam = team.copy(
+                    position = index,
+                    score = if (index >= 2 || team.id == loserId) 0 else team.score
+                )
+                teamDao.updateTeam(updatedTeam)
             }
 
             Result.Success(Unit)
@@ -139,9 +153,11 @@ class GameRepositoryImpl @Inject constructor(
                 return Result.Success(null)
             }
 
+            val settings = settingsDao.getSettings()
+            val targetScore = settings?.targetScore ?: GameConstants.DEFAULT_TARGET_SCORE
+
             val team1 = onCourtTeams[0]
             val team2 = onCourtTeams[1]
-            val targetScore = GameConstants.DEFAULT_TARGET_SCORE
 
             // Check overtime condition
             if (team1.score == targetScore - 1 && team2.score == targetScore - 1) {
@@ -161,8 +177,20 @@ class GameRepositoryImpl @Inject constructor(
 
     override suspend fun handleOvertime(): Result<Unit> {
         return try {
-            // In overtime, first to reach overtime_score wins
-            // This is handled in the ViewModel
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun updateTargetScore(targetScore: Int): Result<Unit> {
+        return try {
+            val currentSettings = settingsDao.getSettings()
+            if (currentSettings == null) {
+                settingsDao.insertSettings(SettingsEntity(targetScore = targetScore))
+            } else {
+                settingsDao.updateTargetScore(targetScore)
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)

@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
                             if (currentRoute in listOf(
                                     Screen.Scoreboard.route,
                                     Screen.Teams.route,
-                                    Screen.History.route,
                                     Screen.Settings.route
                                 )
                             ) {

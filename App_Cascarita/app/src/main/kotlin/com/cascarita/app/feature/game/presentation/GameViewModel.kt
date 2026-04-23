@@ -6,6 +6,7 @@ import com.cascarita.app.core.common.GameConstants
 import com.cascarita.app.core.common.Result
 import com.cascarita.app.feature.game.domain.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +37,9 @@ class GameViewModel @Inject constructor(
     private val getQueuedTeamsUseCase: GetQueuedTeamsUseCase,
     private val checkWinConditionUseCase: CheckWinConditionUseCase,
     private val handleOvertimeUseCase: HandleOvertimeUseCase,
-    private val observeGameStateUseCase: ObserveGameStateUseCase
+    private val observeGameStateUseCase: ObserveGameStateUseCase,
+    private val updateTargetScoreUseCase: UpdateTargetScoreUseCase,
+    private val removeTeamUseCase: com.cascarita.app.feature.team.domain.RemoveTeamUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
@@ -49,27 +52,24 @@ class GameViewModel @Inject constructor(
     private fun observeGameState() {
         observeGameStateUseCase().onEach { gameState ->
             val teams = gameState.teams
-            val team1 = if (teams.size > 0) teams[0] else null
+            val team1 = if (teams.isNotEmpty()) teams[0] else null
             val team2 = if (teams.size > 1) teams[1] else null
             val queuedTeams = teams.filter { it.position >= 2 }
-
-            // Check for overtime
-            val isOvertime = team1 != null && team2 != null &&
-                team1.score == gameState.targetScore - 1 &&
-                team2.score == gameState.targetScore - 1
 
             _uiState.value = _uiState.value.copy(
                 team1 = team1,
                 team2 = team2,
                 queuedTeams = queuedTeams,
                 targetScore = gameState.targetScore,
-                isOvertime = isOvertime,
+                isOvertime = gameState.isOvertime,
                 winner = gameState.winner,
                 isGameFinished = gameState.isGameFinished
             )
 
             // Check win condition
-            checkWinCondition()
+            if (!gameState.isGameFinished) {
+                checkWinCondition()
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -99,7 +99,8 @@ class GameViewModel @Inject constructor(
                             winner = winner,
                             isGameFinished = true
                         )
-                        // Auto-rotate after a delay
+                        // Auto-rotate after a short delay to let user see the win
+                        delay(2000)
                         rotateTeams(winner.id)
                     }
                 }
@@ -150,6 +151,19 @@ class GameViewModel @Inject constructor(
                 }
                 else -> {}
             }
+        }
+    }
+
+    fun updateTargetScore(newTarget: Int) {
+        if (newTarget < 1) return
+        viewModelScope.launch {
+            updateTargetScoreUseCase(newTarget)
+        }
+    }
+
+    fun removeTeam(teamId: Long) {
+        viewModelScope.launch {
+            removeTeamUseCase(teamId)
         }
     }
 }
