@@ -56,13 +56,24 @@ class TeamRepositoryImpl @Inject constructor(
                 allTeams.remove(teamToRemove)
                 
                 // Reposition remaining teams
-                allTeams.forEachIndexed { index, team ->
-                    teamDao.updateTeam(team.copy(position = index))
+                val updatedTeams = allTeams.mapIndexed { index, team ->
+                    team.copy(position = index)
                 }
                 
+                // Use a transaction for both deletion and updates
                 teamDao.deleteTeam(teamToRemove)
+                teamDao.updateTeams(updatedTeams)
             }
             
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun deleteAllTeams(): Result<Unit> {
+        return try {
+            teamDao.deleteAllTeams()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)

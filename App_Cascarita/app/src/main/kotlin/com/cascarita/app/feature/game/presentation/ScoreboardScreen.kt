@@ -42,10 +42,10 @@ fun ScoreboardScreen(
             .fillMaxSize()
             .background(Surface)
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(32.dp) // Increased spacing
     ) {
         item {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         // Scoreboard
@@ -66,11 +66,13 @@ fun ScoreboardScreen(
         }
 
         // Queue Section
-        item {
-            QueueSection(
-                teams = uiState.queuedTeams,
-                onRemoveTeam = { teamId -> viewModel.removeTeam(teamId) }
-            )
+        if (uiState.queuedTeams.size > 1) {
+            item {
+                QueueSection(
+                    teams = uiState.queuedTeams.drop(1), // Show rest of queue
+                    onRemoveTeam = { teamId -> viewModel.removeTeam(teamId) }
+                )
+            }
         }
 
         // Match Settings
@@ -83,7 +85,7 @@ fun ScoreboardScreen(
         }
 
         item {
-            Spacer(modifier = Modifier.height(100.dp)) // Space for bottom nav
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -95,10 +97,12 @@ fun ScoreboardSection(
     isOvertime: Boolean,
     onScorePoint: (Long) -> Unit
 ) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(24.dp) // Increased spacing
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp), // Increased spacing
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Team 1
@@ -111,37 +115,12 @@ fun ScoreboardSection(
             )
 
             // VS Separator
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(2.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, OutlineVariant, Color.Transparent)
-                            )
-                        )
-                )
-                Text(
-                    text = "VS",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Secondary,
-                    fontWeight = FontWeight.Bold
-                )
-                Box(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(2.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(OutlineVariant, OutlineVariant, Color.Transparent)
-                            )
-                        )
-                )
-            }
+            Text(
+                text = "VS",
+                style = MaterialTheme.typography.titleLarge, // Slightly larger
+                color = Secondary.copy(alpha = 0.7f),
+                fontWeight = FontWeight.Black
+            )
 
             // Team 2
             TeamScoreCard(
@@ -154,15 +133,20 @@ fun ScoreboardSection(
         }
 
         if (isOvertime) {
-            Text(
-                text = "¡PRÓRROGA!",
-                style = MaterialTheme.typography.labelLarge,
-                color = Tertiary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            )
+            Surface(
+                color = Tertiary.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "¡MUERTE SÚBITA!",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Tertiary,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
         }
     }
 }
@@ -175,46 +159,51 @@ fun TeamScoreCard(
     onScorePoint: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val cardModifier = if (team != null) {
-        modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceContainerHighest)
-            .clickable { onScorePoint(team.id) }
-            .padding(24.dp)
-    } else {
-        modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceContainerHighest)
-            .padding(24.dp)
-    }
-
-    Box(
-        modifier = cardModifier
+    val backgroundColor = if (isHighlighted) SurfaceContainerHigh else SurfaceContainerHighest
+    
+    Surface(
+        color = backgroundColor,
+        shape = RoundedCornerShape(24.dp), // More rounded
+        modifier = if (team != null) {
+            modifier.clickable { onScorePoint(team.id) }
+        } else {
+            modifier
+        }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp, horizontal = 12.dp)
         ) {
-            Text(
-                text = (team?.name ?: "EQUIPO ?").uppercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = if (isHighlighted) Primary else OnSurfaceVariant,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
-            )
+            Surface(
+                color = if (isHighlighted) Primary.copy(alpha = 0.1f) else Outline.copy(alpha = 0.1f),
+                shape = CircleShape
+            ) {
+                Text(
+                    text = teamLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isHighlighted) Primary else Outline,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                )
+            }
 
             Text(
                 text = team?.score?.toString() ?: "0",
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.displayMedium,
                 color = OnSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Black
             )
 
             Text(
-                text = teamLabel,
-                style = MaterialTheme.typography.labelSmall,
-                color = Outline
+                text = (team?.name ?: "ESPERANDO").uppercase(),
+                style = MaterialTheme.typography.labelLarge,
+                color = OnSurfaceVariant,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
         }
     }
@@ -222,75 +211,71 @@ fun TeamScoreCard(
 
 @Composable
 fun NextTeamBanner(team: Team) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceContainerLow)
+    Surface(
+        color = SurfaceContainerLow,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        // Badge
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(x = 12.dp, y = (-8).dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Tertiary)
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = "SIGUIENTE EQUIPO",
-                style = MaterialTheme.typography.labelSmall,
-                color = OnTertiary,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Column {
+            // Badge
+            Surface(
+                color = Tertiary,
+                shape = RoundedCornerShape(bottomEnd = 12.dp),
+                modifier = Modifier.align(Alignment.Start)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(SurfaceContainerHighest),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.SportsVolleyball,
-                        contentDescription = null,
-                        tint = Tertiary
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = team.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = OnSurface,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Esperando cancha",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceVariant
-                    )
-                }
+                Text(
+                    text = " SIGUIENTE ",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = OnTertiary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
             }
 
-            IconButton(
-                onClick = { /* TODO: Swap to court */ }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        color = SurfaceContainerHighest,
+                        shape = CircleShape,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Outlined.SportsVolleyball,
+                                contentDescription = null,
+                                tint = Tertiary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+
+                    Column {
+                        Text(
+                            text = team.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = OnSurface,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "En espera",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = OnSurfaceVariant
+                        )
+                    }
+                }
+
                 Icon(
                     imageVector = Icons.Default.SwapHoriz,
-                    contentDescription = "Intercambiar",
+                    contentDescription = null,
                     tint = Secondary
                 )
             }
@@ -474,5 +459,12 @@ fun MatchSettingsSection(
                 fontWeight = FontWeight.Bold
             )
         }
+
+        Text(
+            text = "v0.1.3",
+            style = MaterialTheme.typography.labelSmall,
+            color = Outline.copy(alpha = 0.5f),
+            modifier = Modifier.padding(top = 8.dp)
+        )
     }
 }

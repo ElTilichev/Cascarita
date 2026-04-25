@@ -96,17 +96,20 @@ class GameRepositoryImpl @Inject constructor(
             val loserIndex = allTeams.indexOfFirst { it.id == loserId }
             if (loserIndex != -1) {
                 val loserTeam = allTeams.removeAt(loserIndex)
+                // Loser goes to the end of the list
                 allTeams.add(loserTeam)
             }
 
-            // Reset scores for all teams to be safe, or just the ones moving
-            allTeams.forEachIndexed { index, team ->
-                val updatedTeam = team.copy(
+            // Update all teams positions and reset scores for a new game
+            val updatedTeams = allTeams.mapIndexed { index, team ->
+                team.copy(
                     position = index,
-                    score = if (index >= 2 || team.id == loserId) 0 else team.score
+                    // Reset score if it's the winner (who stays at pos 0 or 1) or the loser (who moved to the end)
+                    // Basically, all teams should have 0 score at the start of a new match context
+                    score = if (index < 2) 0 else 0 
                 )
-                teamDao.updateTeam(updatedTeam)
             }
+            teamDao.updateTeams(updatedTeams)
 
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -116,7 +119,9 @@ class GameRepositoryImpl @Inject constructor(
 
     override suspend fun resetScores(): Result<Unit> {
         return try {
-            teamDao.resetAllScores()
+            val allTeams = teamDao.getAllTeamsOnce()
+            val resetTeams = allTeams.map { it.copy(score = 0) }
+            teamDao.updateTeams(resetTeams)
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)

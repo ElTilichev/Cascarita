@@ -66,7 +66,7 @@ fun SettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Versión 0.1.2",
+                        text = "Versión 0.1.3",
                         style = MaterialTheme.typography.bodySmall,
                         color = OnSurfaceVariant
                     )

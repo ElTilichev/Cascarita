@@ -44,6 +44,7 @@ class GameViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
+    private var winCheckJob: kotlinx.coroutines.Job? = null
 
     init {
         observeGameState()
@@ -66,18 +67,22 @@ class GameViewModel @Inject constructor(
                 isGameFinished = gameState.isGameFinished
             )
 
-            // Check win condition
-            if (!gameState.isGameFinished) {
+            // Check win condition only if not already finishing or checking
+            if (!gameState.isGameFinished && winCheckJob?.isActive != true) {
                 checkWinCondition()
             }
         }.launchIn(viewModelScope)
     }
 
     fun scorePoint(teamId: Long) {
+        if (_uiState.value.isGameFinished || _uiState.value.isLoading) return
+        
         viewModelScope.launch {
             when (val result = scorePointUseCase(teamId)) {
                 is Result.Success -> {
                     // Win condition will be checked automatically by flow
+                    // but we can trigger it immediately for better responsiveness
+                    checkWinCondition()
                 }
                 is Result.Error -> {
                     _uiState.value = _uiState.value.copy(
@@ -90,7 +95,10 @@ class GameViewModel @Inject constructor(
     }
 
     private fun checkWinCondition() {
-        viewModelScope.launch {
+        if (_uiState.value.isGameFinished && winCheckJob?.isActive == true) return
+        
+        winCheckJob?.cancel()
+        winCheckJob = viewModelScope.launch {
             when (val result = checkWinConditionUseCase()) {
                 is Result.Success -> {
                     val winner = result.data
@@ -99,7 +107,7 @@ class GameViewModel @Inject constructor(
                             winner = winner,
                             isGameFinished = true
                         )
-                        // Auto-rotate after a short delay to let user see the win
+                        // Wait a bit so the user can see the final score and winner
                         delay(2000)
                         rotateTeams(winner.id)
                     }

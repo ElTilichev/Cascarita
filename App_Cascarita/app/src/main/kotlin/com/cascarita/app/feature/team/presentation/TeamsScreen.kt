@@ -48,7 +48,10 @@ fun TeamsScreen(
 
             // Hero Section
             item {
-                HeroSection()
+                HeroSection(
+                    onDeleteAll = { viewModel.deleteAllTeams() },
+                    showDelete = uiState.onCourtTeams.isNotEmpty() || uiState.queuedTeams.isNotEmpty()
+                )
             }
 
             // On Court Teams
@@ -115,80 +118,86 @@ fun TeamsScreen(
 }
 
 @Composable
-fun HeroSection() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceContainerLow)
-            .padding(24.dp)
+fun HeroSection(
+    onDeleteAll: () -> Unit,
+    showDelete: Boolean
+) {
+    Surface(
+        color = SurfaceContainerLow,
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        // Background glow effect
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = 32.dp, y = (-32).dp)
-                .size(128.dp)
-                .clip(CircleShape)
-                .background(Primary.copy(alpha = 0.1f))
-                .blur(50.dp)
-        )
+        Row(
+            modifier = Modifier.padding(32.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "EQUIPOS",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = OnSurface,
+                    fontWeight = FontWeight.Black
+                )
+                Text(
+                    text = "Gestiona las retas del día",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = OnSurfaceVariant.copy(alpha = 0.8f)
+                )
+            }
 
-        Column {
-            Text(
-                text = "Equipos",
-                style = MaterialTheme.typography.headlineLarge,
-                color = OnSurface,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Gestiona las retas de hoy.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = OnSurfaceVariant
-            )
+            if (showDelete) {
+                IconButton(
+                    onClick = onDeleteAll,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Error.copy(alpha = 0.1f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteSweep,
+                        contentDescription = "Borrar todos",
+                        tint = Error
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 fun OnCourtTeamCard(team: TeamDetail) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(Primary, Secondary)
-                )
-            )
-            .padding(1.dp)
+    Surface(
+        color = SurfaceContainerHighest,
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(2.dp, Primary.copy(alpha = 0.3f)),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(SurfaceContainerLowest)
-                .clip(RoundedCornerShape(15.dp))
-                .padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Primary.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
+                Surface(
+                    color = Primary.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.size(56.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.SportsSoccer,
-                        contentDescription = null,
-                        tint = Primary,
-                        modifier = Modifier.size(32.dp)
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.SportsSoccer,
+                            contentDescription = null,
+                            tint = Primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
 
                 Column {
@@ -196,23 +205,22 @@ fun OnCourtTeamCard(team: TeamDetail) {
                         text = team.name,
                         style = MaterialTheme.typography.titleLarge,
                         color = OnSurface,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Black
                     )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Secondary)
-                        )
-                        Text(
-                            text = "EN CANCHA",
-                            style = MaterialTheme.typography.labelSmall,
+                        Surface(
                             color = Secondary,
-                            fontWeight = FontWeight.Bold
+                            shape = CircleShape,
+                            modifier = Modifier.size(10.dp)
+                        ) {}
+                        Text(
+                            text = "JUGANDO",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Secondary,
+                            fontWeight = FontWeight.Black
                         )
                     }
                 }

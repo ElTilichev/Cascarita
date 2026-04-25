@@ -8,6 +8,8 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+import androidx.room.Transaction
+
 @Dao
 interface TeamDao {
     @Query("SELECT * FROM team ORDER BY position ASC")
@@ -27,6 +29,11 @@ interface TeamDao {
 
     @Update
     suspend fun updateTeam(team: TeamEntity)
+
+    @Transaction
+    suspend fun updateTeams(teams: List<TeamEntity>) {
+        teams.forEach { updateTeam(it) }
+    }
 
     @Delete
     suspend fun deleteTeam(team: TeamEntity)

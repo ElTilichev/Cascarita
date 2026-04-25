@@ -26,6 +26,7 @@ data class TeamUiState(
 class TeamViewModel @Inject constructor(
     private val addTeamUseCase: AddTeamUseCase,
     private val removeTeamUseCase: RemoveTeamUseCase,
+    private val deleteAllTeamsUseCase: DeleteAllTeamsUseCase,
     private val observeTeamListUseCase: ObserveTeamListUseCase
 ) : ViewModel() {
 
@@ -76,6 +77,22 @@ class TeamViewModel @Inject constructor(
     fun removeTeam(teamId: Long) {
         viewModelScope.launch {
             when (val result = removeTeamUseCase(teamId)) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(error = null)
+                }
+                is Result.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        error = result.exception.message
+                    )
+                }
+                else -> {}
+            }
+        }
+    }
+
+    fun deleteAllTeams() {
+        viewModelScope.launch {
+            when (val result = deleteAllTeamsUseCase()) {
                 is Result.Success -> {
                     _uiState.value = _uiState.value.copy(error = null)
                 }

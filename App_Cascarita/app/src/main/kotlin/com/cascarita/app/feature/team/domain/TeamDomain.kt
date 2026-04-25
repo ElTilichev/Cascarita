@@ -24,6 +24,7 @@ interface TeamRepository {
     suspend fun addTeam(name: String, captain: String?): Result<Unit>
     suspend fun removeTeam(teamId: Long): Result<Unit>
     suspend fun updateTeam(team: TeamDetail): Result<Unit>
+    suspend fun deleteAllTeams(): Result<Unit>
 }
 
 class AddTeamUseCase @Inject constructor(private val repository: TeamRepository) {
@@ -38,6 +39,12 @@ class AddTeamUseCase @Inject constructor(private val repository: TeamRepository)
 class RemoveTeamUseCase @Inject constructor(private val repository: TeamRepository) {
     suspend operator fun invoke(teamId: Long): Result<Unit> {
         return repository.removeTeam(teamId)
+    }
+}
+
+class DeleteAllTeamsUseCase @Inject constructor(private val repository: TeamRepository) {
+    suspend operator fun invoke(): Result<Unit> {
+        return repository.deleteAllTeams()
     }
 }
 

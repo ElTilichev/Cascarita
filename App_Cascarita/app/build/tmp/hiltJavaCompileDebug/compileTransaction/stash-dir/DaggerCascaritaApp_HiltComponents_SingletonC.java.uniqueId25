@@ -508,15 +508,15 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
-
       static String com_cascarita_app_feature_team_presentation_TeamViewModel = "com.cascarita.app.feature.team.presentation.TeamViewModel";
 
-      @KeepFieldType
-      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
+      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
 
       @KeepFieldType
       TeamViewModel com_cascarita_app_feature_team_presentation_TeamViewModel2;
+
+      @KeepFieldType
+      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {

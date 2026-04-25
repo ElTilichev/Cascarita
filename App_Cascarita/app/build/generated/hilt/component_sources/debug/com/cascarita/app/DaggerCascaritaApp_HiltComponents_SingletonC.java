@@ -29,6 +29,7 @@ import com.cascarita.app.feature.game.presentation.GameViewModel;
 import com.cascarita.app.feature.game.presentation.GameViewModel_HiltModules;
 import com.cascarita.app.feature.team.data.TeamRepositoryImpl;
 import com.cascarita.app.feature.team.domain.AddTeamUseCase;
+import com.cascarita.app.feature.team.domain.DeleteAllTeamsUseCase;
 import com.cascarita.app.feature.team.domain.ObserveTeamListUseCase;
 import com.cascarita.app.feature.team.domain.RemoveTeamUseCase;
 import com.cascarita.app.feature.team.presentation.TeamViewModel;
@@ -408,15 +409,15 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
-
       static String com_cascarita_app_feature_team_presentation_TeamViewModel = "com.cascarita.app.feature.team.presentation.TeamViewModel";
 
-      @KeepFieldType
-      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
+      static String com_cascarita_app_feature_game_presentation_GameViewModel = "com.cascarita.app.feature.game.presentation.GameViewModel";
 
       @KeepFieldType
       TeamViewModel com_cascarita_app_feature_team_presentation_TeamViewModel2;
+
+      @KeepFieldType
+      GameViewModel com_cascarita_app_feature_game_presentation_GameViewModel2;
     }
   }
 
@@ -485,6 +486,10 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
       return new AddTeamUseCase(singletonCImpl.teamRepositoryImplProvider.get());
     }
 
+    private DeleteAllTeamsUseCase deleteAllTeamsUseCase() {
+      return new DeleteAllTeamsUseCase(singletonCImpl.teamRepositoryImplProvider.get());
+    }
+
     private ObserveTeamListUseCase observeTeamListUseCase() {
       return new ObserveTeamListUseCase(singletonCImpl.teamRepositoryImplProvider.get());
     }
@@ -544,7 +549,7 @@ public final class DaggerCascaritaApp_HiltComponents_SingletonC {
           return (T) new GameViewModel(viewModelCImpl.scorePointUseCase(), viewModelCImpl.rotateTeamsUseCase(), viewModelCImpl.resetScoresUseCase(), viewModelCImpl.getOnCourtTeamsUseCase(), viewModelCImpl.getQueuedTeamsUseCase(), viewModelCImpl.checkWinConditionUseCase(), viewModelCImpl.handleOvertimeUseCase(), viewModelCImpl.observeGameStateUseCase(), viewModelCImpl.updateTargetScoreUseCase(), viewModelCImpl.removeTeamUseCase());
 
           case 1: // com.cascarita.app.feature.team.presentation.TeamViewModel 
-          return (T) new TeamViewModel(viewModelCImpl.addTeamUseCase(), viewModelCImpl.removeTeamUseCase(), viewModelCImpl.observeTeamListUseCase());
+          return (T) new TeamViewModel(viewModelCImpl.addTeamUseCase(), viewModelCImpl.removeTeamUseCase(), viewModelCImpl.deleteAllTeamsUseCase(), viewModelCImpl.observeTeamListUseCase());
 
           default: throw new AssertionError(id);
         }

@@ -7,6 +7,7 @@ import androidx.room.CoroutinesRoom;
 import androidx.room.EntityDeletionOrUpdateAdapter;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
+import androidx.room.RoomDatabaseKt;
 import androidx.room.RoomSQLiteQuery;
 import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
@@ -192,6 +193,12 @@ public final class TeamDao_Impl implements TeamDao {
         }
       }
     }, $completion);
+  }
+
+  @Override
+  public Object updateTeams(final List<TeamEntity> teams,
+      final Continuation<? super Unit> $completion) {
+    return RoomDatabaseKt.withTransaction(__db, (__cont) -> TeamDao.DefaultImpls.updateTeams(TeamDao_Impl.this, teams, __cont), $completion);
   }
 
   @Override
